@@ -25,11 +25,31 @@
     font-weight: bold;
     font-style: italic;
 }
+html
+{
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+    height: 100vh;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 
 html, body {
-    color: white;
+    color: black;
     font-family: Anonymous Pro, serif;
-    background-color: #000;
+    /*background-color: pink;*/
     height: 100%;
     margin: 0;
 }
@@ -48,24 +68,25 @@ main {
     flex-direction: column;
     align-items: center;
 }
-main input
-{
+
+main input {
     padding: 5px 10px;
     border: none;
 }
-main input#submit
-{
+
+main input#submit {
     text-transform: uppercase;
-    background-color: #58ff00;
+    background-color: #00ffea;
     transition: background-color 0.1s linear 0s;
 }
-main input#submit:hover
-{
-    background-color: #a4ff6f;
+
+main input#submit:hover {
+    background-color: #b5fff7;
     cursor: pointer;
 }
-.options
-{
+
+.options {
+    font-weight: bold;
     width: 95%;
     margin: 20px 0;
     text-align: right;
@@ -77,13 +98,14 @@ footer {
     align-items: center;
     justify-content: space-around;
 }
-.rights
-{
+
+.rights {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
+
 .links {
     padding: 20px 5px;
 }
