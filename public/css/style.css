@@ -1,0 +1,93 @@
+@font-face {
+    font-family: Anonymous Pro;
+    src: url("fonts/AnonymousPro/AnonymousPro-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: Anonymous Pro;
+    src: url("fonts/AnonymousPro/AnonymousPro-Italic.ttf") format("truetype");
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: Anonymous Pro;
+    src: url("fonts/AnonymousPro/AnonymousPro-Bold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: Anonymous Pro;
+    src: url("fonts/AnonymousPro/AnonymousPro-BoldItalic.ttf") format("truetype");
+    font-weight: bold;
+    font-style: italic;
+}
+
+html, body {
+    color: white;
+    font-family: Anonymous Pro, serif;
+    background-color: #000;
+    height: 100%;
+    margin: 0;
+}
+
+.wrapper {
+    display: flex;
+    flex-flow: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+
+main {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+main input
+{
+    padding: 5px 10px;
+    border: none;
+}
+main input#submit
+{
+    text-transform: uppercase;
+    background-color: #58ff00;
+    transition: background-color 0.1s linear 0s;
+}
+main input#submit:hover
+{
+    background-color: #a4ff6f;
+    cursor: pointer;
+}
+.options
+{
+    width: 95%;
+    margin: 20px 0;
+    text-align: right;
+}
+
+footer {
+    width: min(350px, 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+.rights
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.links {
+    padding: 20px 5px;
+}
+
+.links img {
+    width: 40px;
+}
