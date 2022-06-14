@@ -12,7 +12,7 @@
     </div>
     <main>
         <h1>Game.io</h1>
-        <form method="post">
+        <form method="post" id="name-form">
             <input type="text" id="name" name="name" placeholder="nickname">
             <input type="submit" id="submit" name="submit" value="play">
         </form>
@@ -28,5 +28,9 @@
         </div>
     </footer>
 </div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/client.js"></script>
+
 </body>
 </html>
