@@ -11,8 +11,9 @@
         options
     </div>
     <main>
+        <h1>Game.io</h1>
         <h1 class="title">Game.io</h1>
-        <form method="post">
+        <form method="post" id="name-form">
             <input type="text" id="name" name="name" placeholder="nickname">
             <input type="submit" id="submit" name="submit" value="play">
         </form>
@@ -53,5 +54,9 @@
         }
     })
 </script>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/client.js"></script>
+
 </body>
 </html>
