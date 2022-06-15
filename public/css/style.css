@@ -25,8 +25,8 @@
     font-weight: bold;
     font-style: italic;
 }
-html
-{
+
+html {
     background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
     background-size: 400% 400%;
     animation: gradient 15s ease infinite;
@@ -35,13 +35,13 @@ html
 
 @keyframes gradient {
     0% {
-        background-position: 0% 50%;
+        background-position: 0 50%;
     }
     50% {
         background-position: 100% 50%;
     }
     100% {
-        background-position: 0% 50%;
+        background-position: 0 50%;
     }
 }
 
@@ -67,6 +67,7 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
+    user-select: none;
 }
 
 main input {
@@ -90,6 +91,8 @@ main input#submit:hover {
     width: 95%;
     margin: 20px 0;
     text-align: right;
+    cursor: pointer;
+    user-select: none;
 }
 
 footer {
@@ -112,4 +115,37 @@ footer {
 
 .links img {
     width: 40px;
+}
+
+.pop-up {
+    display: flex;
+    position: absolute;
+    padding: 0 10px;
+    width: min(500px, calc(100% - 20px));
+    height: auto;
+    background-color: white;
+    flex-direction: column;
+    justify-items: left;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 1;
+}
+
+.pop-up.hidden {
+    top: 30%;
+    opacity: 0;
+    animation: pop-up .5s ease-in-out reverse;
+}
+
+@keyframes pop-up {
+    0%{
+        top: 30%;
+        opacity: 0;
+    }
+    100%{
+
+        top: 50%;
+        opacity: 1;
+    }
 }

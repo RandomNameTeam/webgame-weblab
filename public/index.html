@@ -11,7 +11,7 @@
         options
     </div>
     <main>
-        <h1>Game.io</h1>
+        <h1 class="title">Game.io</h1>
         <form method="post">
             <input type="text" id="name" name="name" placeholder="nickname">
             <input type="submit" id="submit" name="submit" value="play">
@@ -28,5 +28,30 @@
         </div>
     </footer>
 </div>
+<div class="pop-up hidden">
+    <h3>Options</h3>
+    <h4>Audio</h4>
+    <form method="post">
+        <input type="text" id="name-pop-up" name="name" placeholder="nickname">
+        <input type="submit" id="submit-pop-up" name="submit" value="play">
+    </form>
+
+</div>
+<script>
+    let options_button = document.querySelector('.options')
+    let pop_up = document.querySelector('.pop-up')
+
+    options_button.addEventListener('click', evt => {
+        options_button.setAttribute('data-active',
+            options_button.getAttribute('data-active') === 'true' ? 'false' : 'true')
+        if(options_button.getAttribute('data-active') === 'true' )
+        {
+            pop_up.classList.remove('hidden')
+        }
+        else {
+            pop_up.classList.add('hidden')
+        }
+    })
+</script>
 </body>
 </html>
