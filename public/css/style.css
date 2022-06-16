@@ -130,22 +130,10 @@ footer {
     left: 50%;
     transform: translate(-50%, -50%);
     opacity: 1;
+    transition: all .5s ease-in 0s;
 }
 
 .pop-up.hidden {
-    top: 30%;
+    top: -20%;
     opacity: 0;
-    animation: pop-up .5s ease-in-out reverse;
-}
-
-@keyframes pop-up {
-    0%{
-        top: 30%;
-        opacity: 0;
-    }
-    100%{
-
-        top: 50%;
-        opacity: 1;
-    }
 }
