@@ -1,14 +1,19 @@
 const http = require('http');
 const express = require('express');
+const Console = require("console");
 const {v4: uuidv4} = require('uuid');
 const socketio = require('socket.io');
 const {Server} = require("socket.io");
 const bodyParser = require('body-parser')
 const {colours} = require("nodemon/lib/config/defaults");
-const Console = require("console");
+
 
 class Client{
     socketId;
+    hp = 100;
+    commandResours = 0;
+    maxCommandResourse = 100;
+    maxHp = 100;
 
     constructor(name) {
         this.name = name;
@@ -18,6 +23,37 @@ class Client{
 
     getName(){
         return this.name;
+    }
+
+    demage(value){
+        this.hp -= value;
+        if (this.hp < 0){
+            console.log(this.name + " died");
+            return;
+        }
+        console.log(this.name + " get damage:" + value);
+        return;
+
+    }
+
+    heal(value){
+        this.hp += value;
+        if (this.hp > this.maxHp){
+            this.hp = this.maxHp;
+            return;
+        }
+        console.log(this.name + " healing on " + value + " hp:" + this.hp);
+        return
+    }
+
+    setCommandResours(){
+        this.commandResours++;
+        if (this.commandResours > this.maxCommandResourse){
+            this.commandResours = this.maxCommandResourse;
+            return;
+        }
+        return
+        console.log(this.name + " " + this.commandResours);
     }
 
     getLobbiId(){
@@ -105,23 +141,87 @@ app.use(express.static("../frontend"));
 const httpServer = http.createServer(app);
 const io = new Server(httpServer);
 
-/*io.of("/").adapter.on("create-room", (room) => {
-    console.log(`room ${room} was created`);
-});
+function findRoom(s){ // return idRoom
+    var rooms =  s.rooms;
+    var idRoom = rooms.values();
+    var counter = 0;
 
-io.of("/").adapter.on("join-room", (room, id) => {
-    console.log(`socket ${id} has joined room ${room}`);
-});*/
+    for (let room of rooms){
+        if (counter === 1){
+            idRoom = room;
+            break;
+        }
+        counter++;
+    }
+    return idRoom;
+}
 
-/*io.on('connection', (sock) =>{
-    console.log("now it work");
-    sock.join('-1', sock.id);
-    io.to(sock.id).emit('something', 'rapusta2');
-    io.to('-1').emit('something', 'kapusta');
-})*/
+function findLobbi(idRoom){
+    var lobbi;
+    for (var i = 0; i < Lobbies.length; i++){
+        if (Lobbies[i].id == idRoom){
+            lobbi = Lobbies[i];
+            console.log(lobbi);
+            return lobbi;
+        }
+    }
+    return lobbi;
+}
+
+function findPlayerInRoom(sock, lobbi){
+    var player;
+    for (var i =0; i < lobbi.clients.length; i++){
+        if (lobbi.clients[i].socketId === sock.id){
+            player = lobbi.clients[i];
+            break;
+        }
+    }
+    return player;
+}
+
 
 io.on('connection', (sock) =>{
-    console.log(sock.id);
+
+    sock.on('click', async () =>{
+
+        var idRoom = findRoom(sock);
+        var lobbi = findLobbi(idRoom);
+        var player = findPlayerInRoom(sock, lobbi);
+
+        if (lobbi == null){
+            console.log("Lobbi not found");
+            return -1;
+        }
+
+        player.setCommandResours();
+
+    })
+
+    sock.on('skills', (skil) =>{
+        var idRoom = findRoom(sock);
+        var lobbi = findLobbi(idRoom);
+        var player = findPlayerInRoom(sock, lobbi);
+
+        if (skil == "Heal"){
+            if (player.commandResours >= 10){
+                player.heal(10);
+                player.setCommandResours(-10);
+            } else {
+                console.log("enough commandResourse");
+            }
+        } else if (skil == "Damage"){
+            if (player.commandResours >= 10){
+                player.demage(10);
+                player.setCommandResours(-10);
+            } else {
+                console.log("enough commandResourse");
+            }
+
+        } else {
+            console.log("is not skill: " + skil);
+        }
+
+    })
 
 
     if (chekLobbiHasTwoPlayers()) {
