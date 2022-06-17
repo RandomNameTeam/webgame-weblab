@@ -53,7 +53,13 @@ html, body {
     height: 100%;
     margin: 0;
 }
-
+canvas
+{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
 .wrapper {
     display: flex;
     flex-flow: column;
@@ -129,6 +135,7 @@ footer {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 100;
     opacity: 1;
     transition: all .5s ease-in 0s;
 }
