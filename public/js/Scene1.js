@@ -31,6 +31,12 @@ class Scene1 extends Phaser.Scene {
                 " my commandResource: " + commandResource +
                 "enemyHp " + enemyHp);
         })
+        socket.on('death', ()=>{
+            console.log("Death");
+        })
+        socket.on('win', ()=>{
+            console.log("Win");
+        })
         this.commandResource = 0
     }
 

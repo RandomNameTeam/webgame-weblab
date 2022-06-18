@@ -24,12 +24,12 @@ class Client{
 
     demage(value){
         this.hp -= value;
-        if (this.hp < 0){
-            console.log(this.name + " died");
-            return;
+        if (this.hp <= 0){
+
+            return -1;
         }
         console.log(this.name + " get damage:" + value);
-        return;
+        return hp;
 
     }
 
@@ -172,7 +172,6 @@ function findLobbi(idRoom){
     for (var i = 0; i < Lobbies.length; i++){
         if (Lobbies[i].id == idRoom){
             lobbi = Lobbies[i];
-            console.log(lobbi);
             return lobbi;
         }
     }
@@ -201,14 +200,35 @@ function findEnemyInRoom(sock, lobbi){
     return -1;
 }
 
+io.on('end-game', (sockId) =>{
+    var looser = findPlayerInRoom(io.sockets.sockets.get(sockId));
+    var winner = findEnemyInRoom(io.sockets.sockets.get(sockId));
+    console.log("Game Finished")
+    io.to(looser.socketId).emit('death');
+    io.to(winner.socketId).emit('win');
+})
+
 
 io.on('connection', (sock) =>{
     //console.log(sock.id);
+
+    sock.on('end-game', (id) =>{
+        var idRoom = findRoom(sock);
+        var lobbi = findLobbi(idRoom);
+        var player = findPlayerInRoom(sock, lobbi);
+        var enemy = findEnemyInRoom(sock, lobbi);
+        if (enemy === -1){
+            console.log("Enemy dont search");
+            return;
+        }
+
+        console.log("game finished");
+    })
     sock.on('click', async () =>{
 
         var idRoom = findRoom(sock);
         var lobbi = findLobbi(idRoom);
-        var player = findPlayerInRoom(sock, lobbi, false);
+        var player = findPlayerInRoom(sock, lobbi);
         if (player === -1){
             console.log("Player dont search");
             return;
@@ -258,10 +278,15 @@ io.on('connection', (sock) =>{
             }
         } else if (skil === "Damage"){
             if (player.commandResours >= 10){
-                enemy.demage(10);
+                var sost = enemy.demage(100);
                 player.setCommandResours(-10);
             } else {
                 console.log("enough commandResource");
+            }
+
+            if (sost === -1){
+                sock.emit('death');
+                io.sockets.sockets.get(enemy.getSocketId()).emit('win');
             }
 
         } else {
@@ -319,8 +344,7 @@ app.get('/playrs', (req, res) =>{
     res.send(Players);
 })
 app.get('/lobbi', (req, res) =>{
-    console.log(io.of("/").adapter.rooms);
-    console.log(io.of("/my-namespace").adapter.sids);
+
     res.send(Lobbies);
 })
 
