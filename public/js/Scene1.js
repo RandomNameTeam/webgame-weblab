@@ -113,6 +113,7 @@ class Scene1 extends Phaser.Scene {
 
         if (this.timeElapsed > 200) {
             socket.emit('server-update')
+            this.timeElapsed = 0
         }
     }
 
