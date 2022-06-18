@@ -22,10 +22,6 @@ class Client{
 
     }
 
-    getName(){
-        return this.name;
-    }
-
     demage(value){
         this.hp -= value;
         if (this.hp < 0){
@@ -55,6 +51,18 @@ class Client{
         }
         return
         console.log(this.name + " " + this.commandResours);
+    }
+
+    getName(){
+        return this.name;
+    }
+
+    getHp(){
+        return this.hp;
+    }
+
+    getCommandResourse(){
+        return this.commandResours;
     }
 
     getLobbiId(){
@@ -176,20 +184,31 @@ function findPlayerInRoom(sock, lobbi){
     for (var i =0; i < lobbi.clients.length; i++){
         if (lobbi.clients[i].socketId === sock.id){
             player = lobbi.clients[i];
-            break;
+            return enemy
         }
     }
     return player;
 }
 
+function findEnemyInRoom(sock, lobbi){
+    var enemy;
+    for (var i =0; i < lobbi.clients.length; i++){
+        if (lobbi.clients[i].socketId !== sock.id){
+            enemy = lobbi.clients[i];
+            return enemy;
+        }
+    }
+    return enemy;
+}
+
 
 io.on('connection', (sock) =>{
-
+    console.log(sock.id);
     sock.on('click', async () =>{
 
         var idRoom = findRoom(sock);
         var lobbi = findLobbi(idRoom);
-        var player = findPlayerInRoom(sock, lobbi);
+        var player = findPlayerInRoom(sock, lobbi, false);
 
         if (lobbi == null){
             console.log("Lobbi not found");
@@ -198,6 +217,14 @@ io.on('connection', (sock) =>{
 
         player.setCommandResours();
 
+    })
+
+    sock.on('server-update', () =>{
+        var idRoom = findRoom(sock);
+        var lobbi = findLobbi(idRoom);
+        var player = findPlayerInRoom(sock, lobbi);
+        var enemy = findEnemyInRoom(sock, enemy);
+        io.to(idRoom).emit('client-update', player.getHp(), player.getCommandResourse(), enemy.getHp());
     })
 
     sock.on('skills', (skil) =>{
