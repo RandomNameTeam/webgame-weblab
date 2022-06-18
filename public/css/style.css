@@ -144,3 +144,22 @@ footer {
     top: -20%;
     opacity: 0;
 }
+.waiting-msg::after
+{
+    animation: dots 4s ease infinite;
+    content: '';
+}
+@keyframes dots {
+    0%{
+        content: "";
+    }
+    25%{
+        content: ".";
+    }
+    50%{
+        content: "..";
+    }
+    75%{
+        content: "...";
+    }
+}

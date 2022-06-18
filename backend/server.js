@@ -6,6 +6,7 @@ const socketio = require('socket.io');
 const {Server} = require("socket.io");
 const bodyParser = require('body-parser')
 const {colours} = require("nodemon/lib/config/defaults");
+const path = require("path");
 
 
 class Client{
@@ -136,7 +137,9 @@ const urlencodedParser = bodyParser.urlencoded({
 })
 
 app.use(express.static("../public"));
-app.use(express.static("../frontend"));
+
+app.set('views', "../frontend")
+app.set('view engine', 'ejs')
 
 const httpServer = http.createServer(app);
 const io = new Server(httpServer);
@@ -202,19 +205,19 @@ io.on('connection', (sock) =>{
         var lobbi = findLobbi(idRoom);
         var player = findPlayerInRoom(sock, lobbi);
 
-        if (skil == "Heal"){
+        if (skil === "Heal"){
             if (player.commandResours >= 10){
                 player.heal(10);
                 player.setCommandResours(-10);
             } else {
-                console.log("enough commandResourse");
+                console.log("enough commandResource");
             }
-        } else if (skil == "Damage"){
+        } else if (skil === "Damage"){
             if (player.commandResours >= 10){
                 player.demage(10);
                 player.setCommandResours(-10);
             } else {
-                console.log("enough commandResourse");
+                console.log("enough commandResource");
             }
 
         } else {
@@ -255,7 +258,7 @@ httpServer.on('error', (err) =>{
 });
 
 app.get('/', (req, res) =>{
-    res.sendFile( "index.html");
+    res.render('index');
 })
 
 app.post('/', urlencodedParser, (req, res) => {
@@ -264,7 +267,7 @@ app.post('/', urlencodedParser, (req, res) => {
         res.sendFile("index.html");
     }
 
-    res.sendFile("C:\\Users\\виктор\\Desktop\\webgame-weblab\\public\\WaitingLobbi.html")
+    res.render('gameLobby')
 })
 
 app.get('/playrs', (req, res) =>{
