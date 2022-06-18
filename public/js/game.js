@@ -17,5 +17,11 @@ startGame()
 const socket = io()
 socket.on('created-room', () => {
     console.log("hi i am here");
+    socket.emit('click');
+    socket.emit('server-update');
     startGame()
+})
+
+socket.on('client-update', (selfHp, commandResours, enemyHp) =>{
+    console.log("My hp: " + selfHp + " my commandResourse: " + commandResours + "enemyHp " + enemyHp);
 })
