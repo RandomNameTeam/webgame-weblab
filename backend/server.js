@@ -184,7 +184,7 @@ function findPlayerInRoom(sock, lobbi){
     for (var i =0; i < lobbi.clients.length; i++){
         if (lobbi.clients[i].socketId === sock.id){
             player = lobbi.clients[i];
-            return enemy
+            return player
         }
     }
     return player;
@@ -195,7 +195,7 @@ function findEnemyInRoom(sock, lobbi){
     for (var i =0; i < lobbi.clients.length; i++){
         if (lobbi.clients[i].socketId !== sock.id){
             enemy = lobbi.clients[i];
-            return enemy;
+            return enemy
         }
     }
     return enemy;
@@ -223,7 +223,7 @@ io.on('connection', (sock) =>{
         var idRoom = findRoom(sock);
         var lobbi = findLobbi(idRoom);
         var player = findPlayerInRoom(sock, lobbi);
-        var enemy = findEnemyInRoom(sock, enemy);
+        var enemy = findEnemyInRoom(sock, lobbi);
         io.to(idRoom).emit('client-update', player.getHp(), player.getCommandResourse(), enemy.getHp());
     })
 

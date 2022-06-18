@@ -19,6 +19,14 @@ class Scene1 extends Phaser.Scene {
     create() {
         this.createBackground()
         this.initUI()
+
+        this.timeElapsed = 0
+        socket.on('client-update', (selfHp, commandResource, enemyHp)=>{
+            this.updateUI(selfHp, commandResource, enemyHp)
+            console.log("My hp: " + selfHp +
+                " my commandResource: " + commandResource +
+                "enemyHp " + enemyHp);
+        })
     }
 
     preloadBackground() {
@@ -51,11 +59,21 @@ class Scene1 extends Phaser.Scene {
 
     initUI() {
         this.createButton()
-        this.hpRect = this.add.rectangle(20,40,300,30, 0xFF0000)
-        this.hpRect.setOrigin(0,.5)
+
+        this.hpRect = this.add.rectangle(20, 40, 300, 30, 0xFF0000)
+        this.hpRect.setOrigin(0, .5)
         this.hpScore = this.add.bitmapText(360, 43, "pixelFont", "100", 64)
-        this.hpScore.setOrigin(0,.5)
-        this.scoreLabel = this.add.bitmapText(20, 60, "pixelFont", "AP", 64)
+        this.hpScore.setOrigin(0, .5)
+
+        this.hpRectEnemy = this.add.rectangle(game.config.width - 20, 40, 300, 30, 0xFF0000)
+        this.hpRectEnemy.setOrigin(1, .5)
+        this.hpScoreEnemy = this.add.bitmapText(game.config.width - 360, 43, "pixelFont", "100", 64)
+        this.hpScoreEnemy.setOrigin(1, .5)
+
+        this.commandResourceScoreLabel = this.add.bitmapText(20, 90, "pixelFont", "AP", 48)
+            .setOrigin(0,.5)
+        this.commandResourceScore = this.add.bitmapText(82, 90, "pixelFont", "100", 56)
+            .setOrigin(0,.5)
     }
 
     createButton() {
@@ -72,6 +90,30 @@ class Scene1 extends Phaser.Scene {
     buttonUp(pointer, localX, localY, event) {
         this.setFrame(0)
         socket.emit('click');
+    }
+
+    updateUI(selfHp, commandResource, enemyHp) {
+
+        this.hpScore.setText(selfHp)
+        this.hpScore.setPosition(300/100*selfHp + 60,43)
+        this.hpRect.setSize( 300/100*selfHp,this.hpRect.height)
+
+        this.hpScoreEnemy.setText(enemyHp)
+        this.hpScoreEnemy.setPosition(game.config.width - (300/100*selfHp + 60), 43)
+        this.hpRectEnemy.setSize( 300/100*selfHp,this.hpRect.height)
+
+        this.commandResourceScore.setText(commandResource)
+
+
+
+    }
+
+    update(time, delta) {
+        this.timeElapsed += delta
+
+        if (this.timeElapsed > 200) {
+            socket.emit('server-update')
+        }
     }
 
 }
