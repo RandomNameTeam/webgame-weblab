@@ -187,28 +187,32 @@ function findPlayerInRoom(sock, lobbi){
             return player
         }
     }
-    return player;
+    return -1;
 }
 
 function findEnemyInRoom(sock, lobbi){
     var enemy;
     for (var i =0; i < lobbi.clients.length; i++){
-        if (lobbi.clients[i].socketId !== sock.id){
+        if (lobbi.clients[i].socketId != sock.id){
             enemy = lobbi.clients[i];
             return enemy
         }
     }
-    return enemy;
+    return -1;
 }
 
 
 io.on('connection', (sock) =>{
-    console.log(sock.id);
+    //console.log(sock.id);
     sock.on('click', async () =>{
 
         var idRoom = findRoom(sock);
         var lobbi = findLobbi(idRoom);
         var player = findPlayerInRoom(sock, lobbi, false);
+        if (player === -1){
+            console.log("Player dont search");
+            return;
+        }
 
         if (lobbi == null){
             console.log("Lobbi not found");
@@ -223,7 +227,15 @@ io.on('connection', (sock) =>{
         var idRoom = findRoom(sock);
         var lobbi = findLobbi(idRoom);
         var player = findPlayerInRoom(sock, lobbi);
+        if (player === -1){
+            console.log("Player dont search");
+            return;
+        }
         var enemy = findEnemyInRoom(sock, lobbi);
+        if (enemy === -1){
+            console.log("Enemy dont search");
+            return;
+        }
         io.to(idRoom).emit('client-update', player.getHp(), player.getCommandResourse(), enemy.getHp());
     })
 
