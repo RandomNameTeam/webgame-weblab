@@ -251,14 +251,14 @@ io.on('connection', (sock) =>{
 
         if (skil === "Heal"){
             if (player.commandResours >= 10){
-                enemy.heal(10);
+                player.heal(10);
                 player.setCommandResours(-10);
             } else {
                 console.log("enough commandResource");
             }
         } else if (skil === "Damage"){
             if (player.commandResours >= 10){
-                player.demage(10);
+                enemy.demage(10);
                 player.setCommandResours(-10);
             } else {
                 console.log("enough commandResource");
