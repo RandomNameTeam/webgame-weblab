@@ -43,8 +43,8 @@ class Client{
         return
     }
 
-    setCommandResours(){
-        this.commandResours++;
+    setCommandResours(value){
+        this.commandResours+= value;
         if (this.commandResours > this.maxCommandResourse){
             this.commandResours = this.maxCommandResourse;
             return;
@@ -219,7 +219,7 @@ io.on('connection', (sock) =>{
             return -1;
         }
 
-        player.setCommandResours();
+        player.setCommandResours(1);
 
     })
 
@@ -243,10 +243,15 @@ io.on('connection', (sock) =>{
         var idRoom = findRoom(sock);
         var lobbi = findLobbi(idRoom);
         var player = findPlayerInRoom(sock, lobbi);
+        var enemy = findEnemyInRoom(sock, lobbi);
+        if (enemy === -1){
+            console.log("Enemy dont search");
+            return;
+        }
 
         if (skil === "Heal"){
             if (player.commandResours >= 10){
-                player.heal(10);
+                enemy.heal(10);
                 player.setCommandResours(-10);
             } else {
                 console.log("enough commandResource");
