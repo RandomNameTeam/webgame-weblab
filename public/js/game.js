@@ -11,7 +11,7 @@ const startGame = () =>
 {
     game = new Phaser.Game(config)
 }
-
+// startGame()
 const socket = io()
 socket.on('created-room', () => {
     console.log("hi i am here");
