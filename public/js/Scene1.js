@@ -25,12 +25,13 @@ class Scene1 extends Phaser.Scene {
         this.initUI()
 
         this.timeElapsed = 0
-        socket.on('client-update', (selfHp, commandResource, enemyHp)=>{
+        socket.on('client-update', (selfHp, commandResource, enemyHp) => {
             this.updateUI(selfHp, commandResource, enemyHp)
             console.log("My hp: " + selfHp +
                 " my commandResource: " + commandResource +
                 "enemyHp " + enemyHp);
         })
+        this.commandResource = 0
     }
 
     preloadBackground() {
@@ -114,6 +115,7 @@ class Scene1 extends Phaser.Scene {
 
     updateUI(selfHp, commandResource, enemyHp) {
 
+        this.commandResource = commandResource
         this.hpScore.setText(selfHp)
             .setPosition(300 / 100 * selfHp + 60, 43)
         this.hpRect.setSize(300 / 100 * selfHp, this.hpRect.height)
@@ -135,6 +137,8 @@ class Scene1 extends Phaser.Scene {
     }
 
     cardDown(pointer, localX, localY, event) {
+        if (this.scene.commandResource < 10) return
+
         if (this.name === 'heal') {
             this.scene.healCardCD = 3000
             socket.emit('skills', 'Heal')
