@@ -1,7 +1,8 @@
 class Scene1 extends Phaser.Scene {
 
+
     constructor() {
-        super("playGame");
+        super("playGame")
     }
 
     preload() {
@@ -23,21 +24,49 @@ class Scene1 extends Phaser.Scene {
     create() {
         this.createBackground()
         this.initUI()
-
         this.timeElapsed = 0
+        this.skillsCoolDown = 3000 // ms
+        this.transittionDuration = 4000 // ms
+        this.transittionDurationElapsed = 0 // ms
+        this.commandResource = 0
+
         socket.on('client-update', (selfHp, commandResource, enemyHp) => {
             this.updateUI(selfHp, commandResource, enemyHp)
             console.log("My hp: " + selfHp +
                 " my commandResource: " + commandResource +
                 "enemyHp " + enemyHp);
         })
-        socket.on('death', ()=>{
-            console.log("Death");
+        socket.on('death', () => {
+            console.log("defeat")
+            this.scene.transition({
+                target: "endGame",
+                data: {
+                    state: 'defeat'
+                },
+                duration: this.transittionDuration,
+                remove: true,
+                moveBelow: true,
+                onUpdate: this.transitionUpdate,
+                onUpdateScope: this,
+                sleep: true
+            })
         })
-        socket.on('win', ()=>{
-            console.log("Win");
+        socket.on('win', () => {
+            console.log("victory")
+            this.scene.transition({
+                target: "endGame",
+                data: {
+                    state: 'victory'
+                },
+                duration: this.transittionDuration,
+                remove: true,
+                moveBelow: true,
+                onUpdate: this.transitionUpdate,
+                onUpdateScope: this,
+                sleep: true
+            })
         })
-        this.commandResource = 0
+
     }
 
     preloadBackground() {
@@ -62,14 +91,12 @@ class Scene1 extends Phaser.Scene {
             let backgroundLayer = this.add.tileSprite(0, -550, game.config.width, game.config.height, "bg_" + i)
             backgroundLayer.setOrigin(0, 0)
                 .setScale(1.5, 1.5)
-
             this.background.push(backgroundLayer)
         }
 
     }
 
     initUI() {
-        this.createButton()
         this.createCards()
 
         this.hpRect = this.add.rectangle(20, 40, 300, 30, 0xFF0000)
@@ -86,6 +113,11 @@ class Scene1 extends Phaser.Scene {
             .setOrigin(0, .5)
         this.commandResourceScore = this.add.bitmapText(82, 90, "pixelFont", "100", 56)
             .setOrigin(0, .5)
+
+        this.blackscreen = this.add.rectangle(0,0, game.config.width*2, game.config.height*2, 0x000000)
+        this.blackscreen.setAlpha(0)
+
+        this.createButton()
     }
 
     createCards() {
@@ -146,12 +178,12 @@ class Scene1 extends Phaser.Scene {
         if (this.scene.commandResource < 10) return
 
         if (this.name === 'heal') {
-            this.scene.healCardCD = 3000
+            this.scene.healCardCD = this.skillsCoolDown
             socket.emit('skills', 'Heal')
             console.log('heal')
         }
         if (this.name === 'damage') {
-            this.scene.damageCardCD = 3000
+            this.scene.damageCardCD = this.skillsCoolDown
             socket.emit('skills', 'Damage')
             console.log('damage')
         }
@@ -166,6 +198,7 @@ class Scene1 extends Phaser.Scene {
     buttonUp(pointer, localX, localY, event) {
         this.setFrame(0)
         socket.emit('click');
+        console.log('click')
     }
 
     update(time, delta) {
@@ -206,4 +239,9 @@ class Scene1 extends Phaser.Scene {
 
     }
 
+    transitionUpdate() {
+        this.transittionDurationElapsed += 20
+        let alpha = (this.transittionDurationElapsed/ this.transittionDuration)
+        this.blackscreen.setAlpha(alpha)
+    }
 }
