@@ -15,6 +15,14 @@ class Scene1 extends Phaser.Scene {
 
         this.load.image("healCard", "sprites/heal.png")
         this.load.image("damageCard", "sprites/damage.png")
+        this.load.spritesheet("hero", "sprites/hero.png", {
+            frameWidth: 98,
+            frameHeight: 48
+        })
+        this.load.spritesheet("hero_effects", "sprites/hero_effects.png", {
+            frameWidth: 98,
+            frameHeight: 48
+        })
 
         this.load.bitmapFont("pixelFont",
             "font/MatchupPro.png",
@@ -23,6 +31,7 @@ class Scene1 extends Phaser.Scene {
 
     create() {
         this.createBackground()
+        this.createHero()
         this.initUI()
         this.timeElapsed = 0
         this.skillsCoolDown = 3000 // ms
@@ -30,6 +39,12 @@ class Scene1 extends Phaser.Scene {
         this.transittionDurationElapsed = 0 // ms
         this.commandResource = 0
 
+        if (!config.debug) this.socketsInit()
+
+
+    }
+
+    socketsInit() {
         socket.on('client-update', (selfHp, commandResource, enemyHp) => {
             this.updateUI(selfHp, commandResource, enemyHp)
             console.log("My hp: " + selfHp +
@@ -66,7 +81,6 @@ class Scene1 extends Phaser.Scene {
                 sleep: true
             })
         })
-
     }
 
     preloadBackground() {
@@ -114,7 +128,7 @@ class Scene1 extends Phaser.Scene {
         this.commandResourceScore = this.add.bitmapText(82, 90, "pixelFont", "100", 56)
             .setOrigin(0, .5)
 
-        this.blackscreen = this.add.rectangle(0,0, game.config.width*2, game.config.height*2, 0x000000)
+        this.blackscreen = this.add.rectangle(0, 0, game.config.width * 2, game.config.height * 2, 0x000000)
         this.blackscreen.setAlpha(0)
 
         this.createButton()
@@ -151,6 +165,41 @@ class Scene1 extends Phaser.Scene {
             .on("pointerup", this.buttonUp)
     }
 
+    createHeroEffects() {
+        this.heroEffects = this.add.sprite(100, game.config.height / 2 + 60, "hero_effects")
+            .setOrigin(0, .5)
+            .setScale(5)
+
+        this.heroEffectsStateMachine = {
+            0: 1,
+            1: 2,
+            2: -1,
+        }
+        this.heroEffectsState = 0
+        this.heroEffectsLastTime = 0
+    }
+
+    createHero() {
+        this.hero = this.add.sprite(100, game.config.height / 2 + 60, "hero")
+            .setOrigin(0, .5)
+            .setScale(5)
+
+        this.heroStateMachine = {
+            0: 1,
+            1: 0,
+            2: 3,
+            3: 4,
+            4: 5,
+            5: 0,
+            6: 6,
+            7: 0
+        }
+        this.heroState = 0
+        this.heroLastTime = 0
+        this.heroFlag = false
+        this.createHeroEffects()
+    }
+
     updateUI(selfHp, commandResource, enemyHp) {
 
         this.commandResource = commandResource
@@ -175,17 +224,19 @@ class Scene1 extends Phaser.Scene {
     }
 
     cardDown(pointer, localX, localY, event) {
-        if (this.scene.commandResource < 10) return
+        if (!config.debug) if (this.scene.commandResource < 10) return
 
         if (this.name === 'heal') {
-            this.scene.healCardCD = this.skillsCoolDown
-            socket.emit('skills', 'Heal')
             console.log('heal')
+            this.scene.heroEffectsState = 0
+            this.scene.healCardCD = this.scene.skillsCoolDown
+            if (!config.debug) socket.emit('skills', 'Heal')
         }
         if (this.name === 'damage') {
-            this.scene.damageCardCD = this.skillsCoolDown
-            socket.emit('skills', 'Damage')
             console.log('damage')
+            this.scene.damageCardCD = this.scene.skillsCoolDown
+            if (!config.debug) socket.emit('skills', 'Damage')
+            this.scene.heroState = 2
         }
 
         this.disableInteractive()
@@ -197,19 +248,42 @@ class Scene1 extends Phaser.Scene {
 
     buttonUp(pointer, localX, localY, event) {
         this.setFrame(0)
-        socket.emit('click');
+        if (!config.debug) socket.emit('click');
         console.log('click')
     }
 
-    update(time, delta) {
-        this.timeElapsed += delta
+    heroUpdate(time, delta) {
+        switch (this.heroState) {
+            default:
+            case 0:
+            case 1:
+                if (time - this.heroLastTime > 1000) this.heroFlag = true
+                break
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+                if (time - this.heroLastTime > 200) this.heroFlag = true
+                break
 
-
-        if (this.timeElapsed > 200) {
-            socket.emit('server-update')
-            this.timeElapsed = 0
         }
 
+        if (this.heroFlag) {
+            this.heroState = this.heroStateMachine[this.heroState]
+            this.hero.setFrame(this.heroState)
+            this.heroLastTime = time
+            this.heroFlag = false
+        }
+
+        if (time - this.heroEffectsLastTime > 500) {
+            this.heroEffectsState = this.heroEffectsStateMachine[this.heroEffectsState]
+            this.heroEffects.setFrame(this.heroEffectsState)
+            this.heroEffectsLastTime = time
+        }
+    }
+
+    uiUpdate(time, delta) {
         if (this.healCardCD > 0) {
             this.healCardCD -= delta
             this.healCard.setAlpha(
@@ -236,12 +310,29 @@ class Scene1 extends Phaser.Scene {
                 this.damageCard.emit('pointerout')
             }
         }
+    }
+
+    serverUpdate(time, delta) {
+
+        this.timeElapsed += delta
+
+        if (this.timeElapsed > 200) {
+            if (!config.debug) socket.emit('server-update')
+            this.timeElapsed = 0
+        }
+    }
+
+    update(time, delta) {
+
+        this.serverUpdate(time, delta)
+        this.uiUpdate(time, delta)
+        this.heroUpdate(time, delta)
 
     }
 
     transitionUpdate() {
         this.transittionDurationElapsed += 20
-        let alpha = (this.transittionDurationElapsed/ this.transittionDuration)
+        let alpha = (this.transittionDurationElapsed / this.transittionDuration)
         this.blackscreen.setAlpha(alpha)
     }
 }
