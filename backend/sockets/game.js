@@ -3,10 +3,10 @@ const {
     isLobbyHasTwoPlayers, createLobby,
     findRoom, findLobby, findPlayerInRoom,
     findEnemyInRoom, findOpponents, getPlayer, popPlayer,
-    getPlayersCount
+    getPlayersCount, findPlayerByName
 } = require('../modules/lobby')
 
-const {Client} = require('../models/Client')
+const {Client} = require('../models/Client');
 
 
 const InitIO = (httpServer) => {
