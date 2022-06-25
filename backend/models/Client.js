@@ -4,10 +4,14 @@ class Client {
     commandResource = 0;
     maxCommandResource = 100;
     maxHp = 100;
+    numberForBackGround;
+    numberForSkin
 
     constructor(name) {
         this.name = name;
         this.lobbyId = null;
+        this.numberForBackGround = Math.random() % 3;
+        this.numberForSkin = Math.random() % 2;
 
     }
 
@@ -59,6 +63,14 @@ class Client {
 
     getSocketId(){
         return this.socketId;
+    }
+
+    getNumberForBackGround(){
+        return this.numberForBackGround;
+    }
+
+    getNumberForSkin(){
+        return this.numberForSkin;
     }
 }
 
