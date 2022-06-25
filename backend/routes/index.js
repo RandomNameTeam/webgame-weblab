@@ -9,10 +9,11 @@ router.get('/', (req, res) =>{
 })
 
 router.post('/', (req, res) => {
-    addPlayer(req.body.name);
     if (isPlayer(req.body.name)){
-        res.render("index");
+        res.render('gameLobby');
+        return;
     }
+    addPlayer(req.body.name);
     res.render('gameLobby')
 })
 

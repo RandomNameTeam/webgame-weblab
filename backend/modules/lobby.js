@@ -20,7 +20,7 @@ function createLobby(client1, client2, io) {
 
 function isPlayer(name) {
     for (let i = 0; i < Players.length; i++) {
-        if (name === Players[i]) {
+        if (name == Players[i].getName()) {
             return true;
         }
     }
@@ -85,21 +85,36 @@ function getPlayer(id){
     if(id < 0) return Players[Players.length + id]
     return Players[id]
 }
+
+function findPlayerByName(name){
+    for (let i = 0; i < Players.length; i++){
+        if (Players[i].getName() == name){
+            return Players[i];
+        }
+    }
+
+    return -1;
+}
+
 function popPlayer() {
     Players.pop()
 }
+
 function getPlayers() {
     return Players
 }
+
 function getLobbies(){
     return Lobbies
 }
+
 function addPlayer(name){
     Players.push(new Client(name))
 }
+
 module.exports = {
     isLobbyHasTwoPlayers, createLobby,
     isPlayer, findRoom, findLobby, findPlayerInRoom,
     findEnemyInRoom, findOpponents, getPlayer, popPlayer,
-    getPlayersCount, getPlayers, getLobbies, addPlayer
+    getPlayersCount, getPlayers, getLobbies, addPlayer, findPlayerByName
 }
