@@ -31,7 +31,8 @@ class Scene1 extends Phaser.Scene {
 
     create() {
         this.createBackground()
-        this.createHero()
+        this.hero = new Character(this,game.config.width / 2 - 100, game.config.height / 2 + 100, false)
+        this.enemy = new Character(this,game.config.width / 2 + 100, game.config.height / 2 + 100, true, 0xaa0000)
         this.initUI()
         this.timeElapsed = 0
         this.skillsCoolDown = 3000 // ms
@@ -65,6 +66,7 @@ class Scene1 extends Phaser.Scene {
                 onUpdateScope: this,
                 sleep: true
             })
+            this.hero.state = 6
         })
         socket.on('win', () => {
             console.log("victory")
@@ -80,12 +82,16 @@ class Scene1 extends Phaser.Scene {
                 onUpdateScope: this,
                 sleep: true
             })
+            this.enemy.state = 6
         })
         socket.on('enemy-heal', (value) =>{
             console.log("enemy healind on " + value);
+            this.enemy.effects.state = 0
         })
         socket.on('enemy-attack', (value) =>{
             console.log("enemy ataked on " + value);
+            this.enemy.state = 2
+            this.hero.state = 7
         })
     }
 
@@ -171,41 +177,6 @@ class Scene1 extends Phaser.Scene {
             .on("pointerup", this.buttonUp)
     }
 
-    createHeroEffects() {
-        this.heroEffects = this.add.sprite(100, game.config.height / 2 + 60, "hero_effects")
-            .setOrigin(0, .5)
-            .setScale(5)
-
-        this.heroEffectsStateMachine = {
-            0: 1,
-            1: 2,
-            2: -1,
-        }
-        this.heroEffectsState = 0
-        this.heroEffectsLastTime = 0
-    }
-
-    createHero() {
-        this.hero = this.add.sprite(100, game.config.height / 2 + 60, "hero")
-            .setOrigin(0, .5)
-            .setScale(5)
-
-        this.heroStateMachine = {
-            0: 1,
-            1: 0,
-            2: 3,
-            3: 4,
-            4: 5,
-            5: 0,
-            6: 6,
-            7: 0
-        }
-        this.heroState = 0
-        this.heroLastTime = 0
-        this.heroFlag = false
-        this.createHeroEffects()
-    }
-
     updateUI(selfHp, commandResource, enemyHp) {
 
         this.commandResource = commandResource
@@ -234,7 +205,7 @@ class Scene1 extends Phaser.Scene {
 
         if (this.name === 'heal') {
             console.log('heal')
-            this.scene.heroEffectsState = 0
+            this.scene.hero.effects.state = 0
             this.scene.healCardCD = this.scene.skillsCoolDown
             if (!config.debug) socket.emit('skills', 'Heal')
         }
@@ -242,7 +213,8 @@ class Scene1 extends Phaser.Scene {
             console.log('damage')
             this.scene.damageCardCD = this.scene.skillsCoolDown
             if (!config.debug) socket.emit('skills', 'Damage')
-            this.scene.heroState = 2
+            this.scene.hero.state = 2
+            this.scene.enemy.state = 7
         }
 
         this.disableInteractive()
@@ -256,37 +228,6 @@ class Scene1 extends Phaser.Scene {
         this.setFrame(0)
         if (!config.debug) socket.emit('click');
         console.log('click')
-    }
-
-    heroUpdate(time, delta) {
-        switch (this.heroState) {
-            default:
-            case 0:
-            case 1:
-                if (time - this.heroLastTime > 1000) this.heroFlag = true
-                break
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-                if (time - this.heroLastTime > 200) this.heroFlag = true
-                break
-
-        }
-
-        if (this.heroFlag) {
-            this.heroState = this.heroStateMachine[this.heroState]
-            this.hero.setFrame(this.heroState)
-            this.heroLastTime = time
-            this.heroFlag = false
-        }
-
-        if (time - this.heroEffectsLastTime > 500) {
-            this.heroEffectsState = this.heroEffectsStateMachine[this.heroEffectsState]
-            this.heroEffects.setFrame(this.heroEffectsState)
-            this.heroEffectsLastTime = time
-        }
     }
 
     uiUpdate(time, delta) {
@@ -332,7 +273,9 @@ class Scene1 extends Phaser.Scene {
 
         this.serverUpdate(time, delta)
         this.uiUpdate(time, delta)
-        this.heroUpdate(time, delta)
+
+        this.hero.update(time, delta)
+        this.enemy.update(time, delta)
 
     }
 
