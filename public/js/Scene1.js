@@ -81,6 +81,12 @@ class Scene1 extends Phaser.Scene {
                 sleep: true
             })
         })
+        socket.on('enemy-heal', (value) =>{
+            console.log("enemy healind on " + value);
+        })
+        socket.on('enemy-attack', (value) =>{
+            console.log("enemy ataked on " + value);
+        })
     }
 
     preloadBackground() {

@@ -89,10 +89,12 @@ const InitIO = (httpServer) => {
                 } else {
                     console.log("enough commandResource");
                 }
+                io.to(enemy.getSocketId()).emit("enemy-heal", 10);
             } else if (skill === "Damage") {
                 if (player.getCommandResource() >= 10) {
-                    enemy.damage(101);
+                    enemy.damage(10);
                     player.setCommandResource(-10);
+                    io.to(enemy.getSocketId()).emit("enemy-attack", 10);
                 } else {
                     console.log("not enough commandResource");
                 }

@@ -6,7 +6,7 @@ const config = {
     antialias: false,
     antialiasGL: false,
     scene: [Scene1, Scene2],
-    debug: true
+    debug: false
 }
 let game
 let socket
