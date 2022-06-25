@@ -1,29 +1,25 @@
 class Client {
-    socketId;
+    socketId = null;
     hp = 100;
     commandResource = 0;
     maxCommandResource = 100;
     maxHp = 100;
-    numberForBackGround;
-    numberForSkin
 
-    constructor(name) {
+    constructor(name, id) {
         this.name = name;
+        this.id = id;
         this.lobbyId = null;
-        this.numberForBackGround = Math.random() % 3;
-        this.numberForSkin = Math.random() % 2;
-
     }
 
-    damage(value){
+    damage(value) {
         this.hp -= value;
         console.log(this.name + " get damage:" + value);
 
     }
 
-    heal(value){
+    heal(value) {
         this.hp += value;
-        if (this.hp > this.maxHp){
+        if (this.hp > this.maxHp) {
             this.hp = this.maxHp;
             return;
         }
@@ -31,45 +27,46 @@ class Client {
 
     }
 
-    setCommandResource(value){
-        this.commandResource+= value;
-        if (this.commandResource > this.maxCommandResource){
+    setCommandResource(value) {
+        this.commandResource += value;
+        if (this.commandResource > this.maxCommandResource) {
             this.commandResource = this.maxCommandResource;
         }
     }
 
-    getName(){
+    getName() {
         return this.name;
     }
 
-    getHp(){
+    getHp() {
         return this.hp;
     }
 
-    getCommandResource(){
+    getCommandResource() {
         return this.commandResource;
     }
 
-    getLobbyId(){
+    getLobbyId() {
         return this.lobbyId;
     }
 
-    setLobbyId(value){
+    setLobbyId(value) {
         this.lobbyId = value;
     }
-    setSocketId(value){
+
+    setSocketId(value) {
         this.socketId = value;
     }
 
-    getSocketId(){
+    getSocketId() {
         return this.socketId;
     }
 
-    getNumberForBackGround(){
+    getNumberForBackGround() {
         return this.numberForBackGround;
     }
 
-    getNumberForSkin(){
+    getNumberForSkin() {
         return this.numberForSkin;
     }
 }

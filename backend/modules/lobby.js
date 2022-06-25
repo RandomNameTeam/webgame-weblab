@@ -2,11 +2,12 @@ const {v4: uuidv4} = require("uuid");
 const {Client} = require("../models/Client");
 const {Lobby} = require("../models/Lobby");
 
-let Players = []
+let inWaiting = []
 let Lobbies = []
+let inGame = []
 
 function isLobbyHasTwoPlayers() {
-    return Players.length > 1;
+    return inWaiting.length > 1;
 }
 
 function createLobby(client1, client2, io) {
@@ -14,24 +15,32 @@ function createLobby(client1, client2, io) {
     client1.setLobbyId(id);
     client2.setLobbyId(id);
     Lobbies.push(new Lobby(client1, client2, id));
-    io.emit("create-room", id);
     return id;
 }
 
-function isPlayer(name) {
-    for (let i = 0; i < Players.length; i++) {
-        if (name == Players[i].getName()) {
-            return true;
+function inWaitingByUUID(uuid) {
+    for (let i = 0; i < inWaiting.length; i++) {
+        if (uuid === inWaiting[i].id) {
+            return inWaiting[i];
         }
     }
 
     return false;
 }
 
+function isInGame(uuid) {
+    for (let i = 0; i < inGame.length; i++) {
+        if (uuid === inGame[i].id) {
+            return inGame[i];
+        }
+    }
+    return false;
+}
+
 function findRoom(s) { // return idRoom
-    const rooms = s.rooms;
-    let idRoom = rooms.values();
-    let counter = 0;
+    var rooms = s.rooms;
+    var idRoom = rooms.values();
+    var counter = 0;
 
     for (let room of rooms) {
         if (counter === 1) {
@@ -51,7 +60,11 @@ function findLobby(idRoom) {
     }
     return null;
 }
-
+function removeLobby(idRoom) {
+    Lobbies = Lobbies.filter(function (e) {
+        return e.id !== idRoom;
+    });
+}
 function findPlayerInRoom(sock, lobby) {
     for (let i = 0; i < lobby.clients.length; i++) {
         if (lobby.clients[i].socketId === sock.id) {
@@ -73,48 +86,81 @@ function findEnemyInRoom(sock, lobby) {
 function findOpponents(socket) {
     const roomId = findRoom(socket)
     const lobby = findLobby(roomId);
+    if (lobby === null) return {lobby, lobby}
     const player = findPlayerInRoom(socket, lobby);
     const enemy = findEnemyInRoom(socket, lobby);
 
     return {player, enemy}
 }
-function getPlayersCount(){
-    return Players.length
-}
-function getPlayer(id){
-    if(id < 0) return Players[Players.length + id]
-    return Players[id]
+
+function getPlayersCount() {
+    return inWaiting.length
 }
 
-function findPlayerByName(name){
-    for (let i = 0; i < Players.length; i++){
-        if (Players[i].getName() == name){
-            return Players[i];
+function getPlayer(id) {
+    if (id < 0) return inWaiting[inWaiting.length + id]
+    return inWaiting[id]
+}
+
+function inWaitingByName(name) {
+    for (let i = 0; i < inWaiting.length; i++) {
+        if (inWaiting[i].getName() === name) {
+            return inWaiting[i];
         }
     }
-
-    return -1;
+    return false;
 }
 
-function popPlayer() {
-    Players.pop()
+function movePlayer(client = false) {
+
+    if (client) {
+        inWaiting = inWaiting.filter(function (e) {
+            return e !== client;
+        });
+    } else client = inWaiting.pop()
+    inGame.push(client)
+    return client
+}
+function removePlayer(client){
+    inWaiting = inWaiting.filter(function (e) {
+        return e !== client;
+    });
+    inGame = inGame.filter(function (e) {
+        return e !== client;
+    });
 }
 
 function getPlayers() {
-    return Players
+    return inWaiting
 }
 
-function getLobbies(){
+function getLobbies() {
     return Lobbies
 }
 
-function addPlayer(name){
-    Players.push(new Client(name))
+function addPlayer(name) {
+    let client = new Client(name, uuidv4())
+    inWaiting.push(client)
+    return client.id
 }
 
 module.exports = {
-    isLobbyHasTwoPlayers, createLobby,
-    isPlayer, findRoom, findLobby, findPlayerInRoom,
-    findEnemyInRoom, findOpponents, getPlayer, popPlayer,
-    getPlayersCount, getPlayers, getLobbies, addPlayer, findPlayerByName
+    isLobbyHasTwoPlayers,
+    createLobby,
+    inWaitingByUUID,
+    findRoom,
+    findLobby,
+    findPlayerInRoom,
+    findEnemyInRoom,
+    findOpponents,
+    getPlayer,
+    movePlayer,
+    getPlayersCount,
+    getPlayers,
+    getLobbies,
+    addPlayer,
+    inWaitingByName,
+    isInGame,
+    removeLobby,
+    removePlayer
 }

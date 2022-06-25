@@ -7,7 +7,7 @@ class Scene1 extends Phaser.Scene {
 
     preload() {
         this.load.path = "assets/"
-        this.preloadBackground()
+        // this.preloadBackground()
         this.load.spritesheet("button", "sprites/button.png", {
             frameWidth: 120,
             frameHeight: 101
@@ -15,9 +15,18 @@ class Scene1 extends Phaser.Scene {
 
         this.load.image("healCard", "sprites/heal.png")
         this.load.image("damageCard", "sprites/damage.png")
+        this.load.image("background", "sprites/bg/MUzansCastle.png")
         this.load.spritesheet("hero", "sprites/hero.png", {
             frameWidth: 98,
             frameHeight: 48
+        })
+        this.load.spritesheet("hero0", "sprites/hero0.png", {
+            frameWidth: 977,
+            frameHeight: 583
+        })
+        this.load.spritesheet("hero1", "sprites/hero1.png", {
+            frameWidth: 700,
+            frameHeight: 600
         })
         this.load.spritesheet("hero_effects", "sprites/hero_effects.png", {
             frameWidth: 98,
@@ -30,9 +39,27 @@ class Scene1 extends Phaser.Scene {
     }
 
     create() {
-        this.createBackground()
-        this.hero = new Character(this,game.config.width / 2 - 100, game.config.height / 2 + 100, false)
-        this.enemy = new Character(this,game.config.width / 2 + 100, game.config.height / 2 + 100, true, 0xaa0000)
+        // this.createBackground()
+        this.add.image(0,0,'background')
+            .setOrigin(0,0)
+            .setScale(1.7)
+        let enemy_skin, hero_skin
+        console.log(config.skin_data)
+        if(config.skin_data === 0){
+            // hero_skin = 0x00ff00
+            // enemy_skin = 0x0000ff
+            hero_skin = 'hero0'
+            enemy_skin = 'hero1'
+        }else
+        {
+            // enemy_skin = 0x00ff00
+            // hero_skin = 0x0000ff
+            enemy_skin = 'hero0'
+            hero_skin = 'hero1'
+        }
+
+        this.hero = new Character(this,game.config.width / 2 - 100, game.config.height / 2 + 210, true, hero_skin)
+        this.enemy = new Character(this,game.config.width / 2 + 100, game.config.height / 2 + 210, false, enemy_skin)
         this.initUI()
         this.timeElapsed = 0
         this.skillsCoolDown = 3000 // ms
@@ -171,7 +198,7 @@ class Scene1 extends Phaser.Scene {
     }
 
     createButton() {
-        this.button = this.add.sprite(game.config.width / 2, game.config.height - 100, "button")
+        this.button = this.add.sprite(game.config.width / 2, game.config.height - 50, "button")
             .setInteractive()
             .on("pointerdown", this.buttonDown)
             .on("pointerup", this.buttonUp)

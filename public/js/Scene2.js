@@ -34,7 +34,7 @@ class Scene2 extends Phaser.Scene {
 
     buttonUp(pointer, localX, localY, event) {
         this.setFrame(0)
-        window.location.href = "/";
+        window.location.href = "/leave";
     }
 
     create(data) {
